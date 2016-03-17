@@ -1,0 +1,6 @@
+---
+# completed tasks
+# - name: proba {{ inventory_hostname }}
+#   local_action: command echo {{ inventory_hostname }}
+- name: Notify when done
+  debug:  msg="{{inventory_hostname}} is all done"

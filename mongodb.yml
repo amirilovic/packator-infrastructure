@@ -1,0 +1,20 @@
+---
+- name: install_user_ubuntu
+  hosts: mongodb
+  remote_user: ubuntu
+  tags: user_ubuntu
+  roles:
+    - locale
+    - common
+    - { role: create_deploy_user, fullaccess: false }
+    - mongodb_server
+
+- name: install_user_deploy
+  hosts: mongodb
+  remote_user: ubuntu
+  become_user: deploy
+  become: yes
+  tags: user_deploy
+  roles:
+    - locale
+    - copy_authorized_keys

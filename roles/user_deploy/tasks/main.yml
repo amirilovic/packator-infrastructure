@@ -1,0 +1,13 @@
+---
+# tasks file for user_deploy
+- name: Create apps dir.
+  file: path=/home/deploy/apps state=directory mode="g+s"
+
+- name: Create apps dir.
+  file: path=/home/deploy/apps/{{appname}} state=directory mode="g+s"
+
+- name: Create apps subdir.
+  file: path=/home/deploy/apps/{{appname}}/{{item}} state=directory
+  with_items:
+    - releases
+    - shared

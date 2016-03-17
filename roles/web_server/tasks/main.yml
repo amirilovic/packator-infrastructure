@@ -1,0 +1,18 @@
+---
+# tasks file for web_server
+- name: Adding node 4.x to apt get.
+  shell: curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
+  sudo: yes
+
+- name: Installing nodejs.
+  apt: state=present name={{ item }}
+  sudo: yes
+  with_items:
+  - nodejs
+
+- name: Installing nodejs pm2 module.
+  command: npm install pm2 -g
+  sudo: yes
+
+
+

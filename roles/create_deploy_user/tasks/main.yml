@@ -1,0 +1,34 @@
+---
+# tasks file for create_deploy_user
+- name: Creating user deploy.
+  user: name=deploy createhome=yes shell=/bin/bash password=cdTabMFnNH9wE
+  sudo: yes
+
+- name: Copying deploy user sudoers configuration.
+  copy: src=deploy-users.nopasswd dest=/etc/sudoers.d/deploy-users owner=root group=root mode=0440
+  sudo: yes
+  when: fullaccess is defined and fullaccess
+
+- name: Copying deploy user sudoers configuration.
+  copy: src=deploy-users.passwd dest=/etc/sudoers.d/deploy-users owner=root group=root mode=0440
+  sudo: yes
+  when: fullaccess is undefined or not fullaccess
+
+
+- name: Creating deploy .ssh dir.
+  file: path=/home/deploy/.ssh state=directory
+  sudo: yes
+
+- name: Checking deploy .ssh/authorized_keys file.
+  stat: path=/home/deploy/.ssh/authorized_keys
+  sudo: yes
+  register: deploy_ssh
+
+- name: Copying access keys.
+  command: cp /home/ubuntu/.ssh/authorized_keys /home/deploy/.ssh/
+  sudo: yes
+  when: not deploy_ssh.stat.exists
+
+- name: Setting access rights for deploy .ssh dir.
+  file: path=/home/deploy/.ssh recurse=yes owner=deploy group=deploy
+  sudo: yes

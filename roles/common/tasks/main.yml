@@ -1,0 +1,68 @@
+---
+# tasks file for user_ubuntu
+- name: ping the server
+  ping:
+- name: Update APT caches.
+  apt: update_cache=yes
+  sudo: yes
+- name: Performing package upgrade.
+  apt: upgrade=yes
+  sudo: yes
+- name: Installing build-essential packages.
+  apt: state=present name={{ item }}
+  sudo: yes
+  with_items:
+  - build-essential
+
+- name: Installing rvm/dev packages.
+  apt: state=present name={{ item }}
+  sudo: yes
+  with_items:
+  - g++
+  - make
+  - libreadline6-dev
+  - libssl-dev
+  - libyaml-dev
+  - libsqlite3-dev
+  - sqlite3
+  - autoconf
+  - libgdbm-dev
+  - libncurses5-dev
+  - automake
+  - libtool
+  - bison
+  - pkg-config
+  - libffi-dev
+
+- name: Installing XML/XSLT packages.
+  apt: state=present name={{ item }}
+  sudo: yes
+  with_items:
+  - libxml2-dev
+  - libxslt1-dev
+
+- name: Installing utility packages.
+  apt: state=present name={{ item }}
+  sudo: yes
+  with_items:
+  - whois
+  - zip
+  - htop
+  - tmux
+  - ntp
+  - iftop
+
+- name: Installing version control system packages.
+  apt: state=present name={{ item }}
+  sudo: yes
+  with_items:
+  - git
+
+- name: Installing db client packages.
+  apt: state=present name={{ item }}
+  sudo: yes
+  with_items:
+  - libmysqlclient-dev
+  - mysql-client
+  - mongodb-clients
+  - redis-tools

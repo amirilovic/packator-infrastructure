@@ -1,0 +1,103 @@
+---
+# tasks file for mongodb_server
+- name: Installing MongoDB key.
+  apt_key: state=present keyserver=hkp://keyserver.ubuntu.com:80 id=7F0CEB10
+  sudo: yes
+
+- name: Copying MongoDB APT source list.
+  copy: content="deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.0 multiverse" dest=/etc/apt/sources.list.d/mongodb-org-3.0.list owner=root group=root mode=0644
+  sudo: yes
+
+- name: Update APT caches.
+  apt: update_cache=yes
+  sudo: yes
+
+- name: Installing MongoDB packages
+  apt: state=present name={{ item }}
+  sudo: yes
+  with_items:
+    - mongodb-org
+
+- name: Creating mount dir
+  file: path={{item}} state=directory
+  with_items:
+    - /data
+    - /journal
+    - /log
+  sudo: yes
+
+- name: Creating filesystems
+  filesystem: fstype=ext4 dev={{item}}
+  with_items:
+    - /dev/xvdf
+    - /dev/xvdg
+    - /dev/xvdh
+  sudo: yes
+
+- name: Mounting devices
+  mount: name={{item.path}} src={{item.dev}} fstype=ext4 opts=defaults,auto,noatime,noexec state=mounted
+  with_items:
+    - { dev: '/dev/xvdf', path: /data }
+    - { dev: '/dev/xvdg', path: /journal }
+    - { dev: '/dev/xvdh', path: /log }
+  sudo: yes
+
+- name: Setting ownership of MongoDB dirs
+  file: path={{item}} state=directory owner=mongodb group=mongodb
+  with_items:
+    - /data
+    - /journal
+    - /log
+  sudo: yes
+
+- name: Linking journal to data dir
+  file: src=/journal dest=/data/journal state=link
+  sudo: yes
+
+- name: Updating MongoDB configuration
+  copy: src=files/etc/mongod.conf dest=/etc/mongod.conf owner=root group=root mode=0755
+  sudo: yes
+
+- name: Configuring ulimit settings
+  lineinfile: dest=/etc/security/limits.conf line="{{item}}"
+  with_items:
+    - '* soft nofile 64000'
+    - '* hard nofile 64000'
+    - '* soft nproc 32000'
+    - '* hard nproc 32000'
+  sudo: yes
+
+- name: Configuring ulimit settings
+  lineinfile: dest=/etc/security/limits.d/90-nproc.conf line="{{item}}" create=yes
+  with_items:
+    - '* soft nproc 32000'
+    - '* hard nproc 32000'
+  sudo: yes
+
+- name: Configuring read ahead size
+  lineinfile: dest=/etc/udev/rules.d/85-ebs.rules line='ACTION=="add", KERNEL=="{{item}}", ATTR{bdi/read_ahead_kb}="16"' create=yes
+  with_items:
+    - xvdf
+    - xvdg
+    - xvdh
+  sudo: yes
+
+# - name: Configuring kernel transparent_hugepage settings
+#   lineinfile: dest=/etc/sysfs.conf line="{{item}}" create=yes
+#   with_items:
+#     - 'kernel/mm/transparent_hugepage/enabled = never'
+#     - 'kernel/mm/transparent_hugepage/defrag = never'
+#   sudo: yes
+
+# see: http://docs.mongodb.org/manual/tutorial/transparent-huge-pages/
+- name: Copying disable-transparent-hugepages init.d script
+  copy: src=files/etc/init.d/disable-transparent-hugepages dest=/etc/init.d/disable-transparent-hugepages owner=root group=root mode=0755
+  sudo: yes
+
+- name: Configuring system to run disable-transparent-hugepages on boot
+  command: update-rc.d disable-transparent-hugepages defaults
+  sudo: yes
+
+- name: Restarting MongoDB server
+  service: name=mongod state=restarted
+  sudo: yes

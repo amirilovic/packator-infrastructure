@@ -1,0 +1,4 @@
+---
+# tasks file for locale
+- name: Set LC_CTYPE in .bashrc
+  lineinfile: dest=~/.bashrc regexp='export LC_CTYPE="en_US.utf8"' insertafter=EOF line='export LC_CTYPE="en_US.utf8"'

@@ -1,0 +1,26 @@
+- name: install_app_server_prerequisites
+  hosts: app
+  remote_user: ubuntu
+  tags: user_ubuntu
+  roles:
+    - locale
+    - common
+    - web_server
+    - { role: create_deploy_user, fullaccess: false }
+  tasks:
+    - include: tasks/completed.yml
+
+- name: setup_deploy_user
+  hosts: app
+  remote_user: ubuntu
+  become_user: deploy
+  become: yes
+  tags: user_deploy
+  roles:
+    - locale
+    - role: user_deploy
+      appname: 'packator'
+    - copy_authorized_keys
+  tasks:
+    - include: tasks/completed.yml
+

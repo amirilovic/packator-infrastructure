@@ -1,0 +1,7 @@
+---
+# tasks file for copy_authorized_keys
+- name: Set up authorized_keys for the deploy user
+  authorized_key: user=deploy
+                  key="{{ item }}"
+  with_file:
+    - public_keys/aleksandar.mirilovic
