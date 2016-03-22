@@ -33,6 +33,7 @@
   - bison
   - pkg-config
   - libffi-dev
+  - libkrb5-dev
 
 - name: Installing XML/XSLT packages.
   apt: state=present name={{ item }}
