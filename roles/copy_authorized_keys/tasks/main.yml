@@ -5,3 +5,4 @@
                   key="{{ item }}"
   with_file:
     - public_keys/aleksandar.mirilovic
+    - public_keys/uros.pajic
