@@ -19,7 +19,7 @@
   roles:
     - locale
     - role: user_deploy
-      appname: 'packator'
+      appname: 'packator-backend'
     - copy_authorized_keys
   tasks:
     - include: tasks/completed.yml

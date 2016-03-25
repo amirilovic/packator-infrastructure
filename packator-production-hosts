@@ -1,0 +1,5 @@
+[app]
+packator-production-app-0 ansible_connection=ssh ansible_host=ec2-50-16-160-112.compute-1.amazonaws.com
+
+[mongodb]
+packator-production-mongodb-0 ansible_connection=ssh ansible_host=ec2-54-88-34-220.compute-1.amazonaws.com
